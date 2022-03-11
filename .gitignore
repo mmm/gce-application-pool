@@ -1,0 +1,8 @@
+.envrc
+tmp
+
+.terraform
+*tfstate*
+.ropeproject
+
+*.tfvars
