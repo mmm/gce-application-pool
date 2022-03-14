@@ -92,6 +92,8 @@ already installed in your GCP Cloudshell.
 
 ## Workshop infrastructure
 
+![Workshop Infrastructure](media/application-pool.png)
+
 ### Set up some basic networking requirements
 
 A couple of network dependencies:
