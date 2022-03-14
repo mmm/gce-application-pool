@@ -20,11 +20,18 @@ locals {
   #image = "centos-cloud/centos-8"
 }
 
+#data "terraform_remote_state" "network" {
+  #backend = "gcs"
+  #config = {
+    #bucket  = var.state_bucket
+    #prefix  = "terraform/network/state"
+  #}
+#}
 data "terraform_remote_state" "network" {
-  backend = "gcs"
+  backend = "local"
+
   config = {
-    bucket  = var.state_bucket
-    prefix  = "terraform/network/state"
+    path = "../network/terraform.tfstate"
   }
 }
 
@@ -47,7 +54,9 @@ resource "google_compute_instance_template" "app_client" {
   metadata = {
     enable-oslogin = "TRUE"
   }
-  metadata_startup_script = file("provision-ubuntu.sh")
+  metadata_startup_script = templatefile("provision-ubuntu.sh.tmpl", {
+    target_ip = data.terraform_remote_state.network.outputs.ilb_head_address
+  })
 
   service_account {
     #scopes = ["userinfo-email", "compute-ro", "storage-full"]
