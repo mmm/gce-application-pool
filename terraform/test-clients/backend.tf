@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-terraform {
-  backend "gcs" {
-    # must specify "bucket" when running terraform.
-    # E.g., `terraform init -backend-config="bucket=mybucket"`
-    prefix  = "terraform/clients/state"
-  }
-}
+#terraform {
+#  backend "gcs" {
+#    # must specify "bucket" when running terraform.
+#    # E.g., `terraform init -backend-config="bucket=mybucket"`
+#    prefix  = "terraform/clients/state"
+#  }
+#}
