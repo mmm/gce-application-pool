@@ -94,7 +94,7 @@ already installed in your GCP Cloudshell.
 
 ![Workshop Infrastructure](media/application-pool.png)
 
-### Set up some basic networking requirements
+### 1. Set up some basic networking requirements
 
 A couple of network dependencies:
 
@@ -110,7 +110,7 @@ here so we can bounce subsequent infrastructure up and down during development
 without having to change test client config.
 
 
-### Create a Cloud SQL database for the application to use
+### 2. Create a Cloud SQL database for the application to use
 
 Create a Cloud SQL managed Postgresql-12 database instance.
 
@@ -123,7 +123,7 @@ and wait for the resources to be created.  It can take a few minutes for the
 database creation to complete.
 
 
-### Create a pool of application server instances
+### 3. Create a pool of application server instances
 
 Next, spin up application servers
 
@@ -135,7 +135,7 @@ Next, spin up application servers
 and wait for the resources to be created.
 
 
-### Create a load balancer for the application service
+### 4. Create a load balancer for the application service
 
 Create an [Internal Load Balancer](https://cloud.google.com/load-balancing/docs/internal)
 
@@ -153,7 +153,7 @@ It's often better to split those two templates apart as they might be managed
 by separate teams, but we'll keep them together for simplicity.
 
 
-### Create test clients to load the application service
+### 5. Create test clients to load the application service
 
 Here you spin up test clients to siege the head of the load balancer and
 generate some load:
