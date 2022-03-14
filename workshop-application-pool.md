@@ -73,7 +73,7 @@ shows that new project.
 All example commands below run from this Cloud Shell.
 
 
-## Example source
+## Workshop source
 
 Get the source
 
@@ -90,7 +90,9 @@ We use [Terraform](terraform.io) for these examples and the latest version is
 already installed in your GCP Cloudshell.
 
 
-## Set up some basic networking requirements
+## Workshop infrastructure
+
+### Set up some basic networking requirements
 
 A couple of network dependencies:
 
@@ -106,7 +108,7 @@ here so we can bounce subsequent infrastructure up and down during development
 without having to change test client config.
 
 
-## Create a Cloud SQL database for the application to use
+### Create a Cloud SQL database for the application to use
 
 Create a Cloud SQL managed Postgresql-12 database instance.
 
@@ -119,7 +121,7 @@ and wait for the resources to be created.  It can take a few minutes for the
 database creation to complete.
 
 
-## Create a pool of application server instances
+### Create a pool of application server instances
 
 Next, spin up application servers
 
@@ -131,7 +133,7 @@ Next, spin up application servers
 and wait for the resources to be created.
 
 
-## Create a load balancer for the application service
+### Create a load balancer for the application service
 
 Create an [Internal Load Balancer](https://cloud.google.com/load-balancing/docs/internal)
 
@@ -149,7 +151,7 @@ It's often better to split those two templates apart as they might be managed
 by separate teams, but we'll keep them together for simplicity.
 
 
-## Create test clients to load the application service
+### Create test clients to load the application service
 
 Here you spin up test clients to siege the head of the load balancer and
 generate some load:
@@ -159,11 +161,12 @@ generate some load:
     terraform plan
     terraform apply
 
-These test nodes need to be manually configured with a `SIEGE_TARGET` before
-you kick this off.
+These test nodes are automatically configured use the internal address reserved
+for the head of the internal load balancer during the network setup as their
+`SIEGE_TARGET` address.
 
-They just use old-school apache-bench to siege the head of the internal load
-balancer as soon as they start up.
+These clients just use old-school apache-bench to siege the head of the
+internal load balancer as soon as they start up.
     
 
 ## Cleaning up
