@@ -1,4 +1,4 @@
-# Workshop - Application Pool
+# GCE Legacy Application Pools
 
 What if you have a legacy application that you want to run in Google Cloud,
 and you still want to take advantage of as much of the automation and intelligent
@@ -21,8 +21,7 @@ applications on Google Cloud.
 work to solve a very specific problem. Nothing here is production-ready and
 should not be used for any production applications.
 
-**Note**: This is WIP and isn't completely working yet.
+## Test scenarios / workshops
 
-## Test scenarios
+- [Basic Application Pool Workshop](workshop-application-pool.md)
 
-- [Basic Application Pool](workshop-application-pool.md)
