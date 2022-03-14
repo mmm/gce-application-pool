@@ -42,18 +42,23 @@ apt-get -qqy install \
   docker-compose
 echo '*;*;*;Al0000-2400;docker' >> /etc/security/group.conf
 
-# set up a siege engine
-mkdir -p /opt/siege
-cat <<- 'EOS' > /opt/siege/docker-compose.yml
-version: "3"
-services:
-  siege:
-    image: markmims/siege-engine
-    environment:
-      SIEGE_TARGET: http://10.128.0.26/
-      SIEGE_THREADS: 10
+siege_target_ip() {
+  local target_ip=$1
+
+  # set up a siege engine
+  mkdir -p /opt/siege
+  cat <<- 'EOS' > /opt/siege/docker-compose.yml
+  version: "3"
+  services:
+    siege:
+      image: markmims/siege-engine
+      environment:
+        SIEGE_TARGET: http://${target_ip}/
+        SIEGE_THREADS: 10
 EOS
 
-docker-compose -f /opt/siege/docker-compose.yml pull
-docker-compose -f /opt/siege/docker-compose.yml up -d
+  #docker-compose -f /opt/siege/docker-compose.yml pull
+  #docker-compose -f /opt/siege/docker-compose.yml up -d
 
+}
+[ -z "${target_ip}" ] || siege_target_ip ${target_ip}
