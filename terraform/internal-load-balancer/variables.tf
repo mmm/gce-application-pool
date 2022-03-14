@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable "state_bucket" {}
-
 variable "region" {
   default = "us-central1"
 }
