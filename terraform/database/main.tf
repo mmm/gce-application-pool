@@ -27,24 +27,6 @@ data "google_compute_network" "private_network" {
   name = var.network
 }
 
-#resource "google_sql_database_instance" "master" {
-  #name             = "omg-master-instance"
-  #database_version = "POSTGRES_12"
-  #region           = var.region
-
-  #settings {
-    ## Second-generation instance tiers are based on the machine
-    ## type. See argument reference below.
-    #tier = "db-f1-micro"
-
-    ##ip_configuration {
-      ##ipv4_enabled = false
-      ##private_network = "projects/mmm-goog-ad-maggie/global/networks/default"
-    ##}
-  #}
-  #deletion_protection = false
-#}
-
 resource "google_sql_database_instance" "private" {
   name             = "private-master-instance"
   database_version = "POSTGRES_12"
