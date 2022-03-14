@@ -57,8 +57,7 @@ siege_target_ip() {
         SIEGE_THREADS: 10
 EOS
 
-  #docker-compose -f /opt/siege/docker-compose.yml pull
-  #docker-compose -f /opt/siege/docker-compose.yml up -d
-
+  docker-compose -f /opt/siege/docker-compose.yml pull
+  docker-compose -f /opt/siege/docker-compose.yml up -d
 }
 [ -z "${target_ip}" ] || siege_target_ip ${target_ip}

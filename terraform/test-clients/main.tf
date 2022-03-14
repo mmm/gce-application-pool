@@ -55,8 +55,8 @@ resource "google_compute_instance_template" "app_client" {
     enable-oslogin = "TRUE"
   }
   metadata_startup_script = templatefile("provision-ubuntu.sh.tmpl", {
-    target_ip = data.terraform_remote_state.network.outputs.output.ilb_head_address
-  }
+    target_ip = data.terraform_remote_state.network.outputs.ilb_head_address
+  })
 
   service_account {
     #scopes = ["userinfo-email", "compute-ro", "storage-full"]
