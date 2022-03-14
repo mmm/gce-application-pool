@@ -17,19 +17,33 @@ locals {
   num_app_servers = 6
 }
 
+#data "terraform_remote_state" "network" {
+  #backend = "gcs"
+  #config = {
+    #bucket  = var.state_bucket
+    #prefix  = "terraform/network/state"
+  #}
+#}
 data "terraform_remote_state" "network" {
-  backend = "gcs"
+  backend = "local"
+
   config = {
-    bucket  = var.state_bucket
-    prefix  = "terraform/network/state"
+    path = "../network/terraform.tfstate"
   }
 }
 
+#data "terraform_remote_state" "application_pool" {
+  #backend = "gcs"
+  #config = {
+    #bucket  = var.state_bucket
+    #prefix  = "terraform/application-pool/state"
+  #}
+#}
 data "terraform_remote_state" "application_pool" {
-  backend = "gcs"
+  backend = "local"
+
   config = {
-    bucket  = var.state_bucket
-    prefix  = "terraform/application-pool/state"
+    path = "../application-pool/terraform.tfstate"
   }
 }
 
