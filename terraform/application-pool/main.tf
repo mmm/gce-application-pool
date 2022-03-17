@@ -14,14 +14,14 @@
 # limitations under the License.
 
 locals {
-  num_app_servers = 6
+  num_app_servers_per_zone = 3
   image = "ubuntu-os-cloud/ubuntu-2004-lts"
   #image = "centos-cloud/centos-7"
   #image = "centos-cloud/centos-8"
 }
 
-resource "google_compute_instance_template" "app_server" {
-  name_prefix  = "regional-app-server"
+resource "google_compute_instance_template" "uig_app_server_template" {
+  name_prefix  = "uig-app-server"
   machine_type = var.instance_type
   region       = var.region
 
@@ -49,34 +49,46 @@ resource "google_compute_instance_template" "app_server" {
   #lifecycle {
     #create_before_destroy = true
   #}
+
+  tags = ["allow-health-check"]
 }
 
-resource "google_compute_region_instance_group_manager" "regional_apps" {
-  name               = "regional-app-server-mig"
-  base_instance_name = "regional-app-server"
-  region               = "us-central1"
-  distribution_policy_zones = ["us-central1-c","us-central1-f"]
-  target_size        = local.num_app_servers
-  version {
-    instance_template  = google_compute_instance_template.app_server.id
+resource "google_compute_instance_from_template" "primary_zone_app_server" {
+  count = local.num_app_servers_per_zone
+  name = "primary-zone-app-server-${count.index}"
+  zone = var.primary_zone
+
+  source_instance_template = google_compute_instance_template.uig_app_server_template.id
+
+  // Override fields from instance template
+  labels = {
+    my_key = "my_value"
   }
 }
 
-#resource "google_compute_region_health_check" "tcp-region-health-check" {
-  #name        = "tcp-region-health-check"
-  #description = "Health check via tcp"
+resource "google_compute_instance_from_template" "secondary_zone_app_server" {
+  count = local.num_app_servers_per_zone
+  name = "seondary-zone-app-server-${count.index}"
+  zone = var.secondary_zone
 
-  #timeout_sec         = 1
-  #check_interval_sec  = 1
-  #healthy_threshold   = 4
-  #unhealthy_threshold = 5
+  source_instance_template = google_compute_instance_template.uig_app_server_template.id
 
-  #tcp_health_check {
-    #port               = "5000"
-    ##port_name          = "health-check-port"
-    ##port_specification = "USE_NAMED_PORT"
-    #request            = "ARE YOU HEALTHY?"
-    #proxy_header       = "NONE"
-    #response           = "I AM HEALTHY"
-  #}
-#}
+  // Override fields from instance template
+  labels = {
+    my_key = "my_value"
+  }
+}
+
+resource "google_compute_instance_group" "primary_zone_uig" {
+  name = "application-uig-primary-zone"
+  zone = var.primary_zone
+
+  instances = [ for instance in google_compute_instance_from_template.primary_zone_app_server: instance.self_link ]
+}
+
+resource "google_compute_instance_group" "secondary_zone_uig" {
+  name = "application-uig-secondary-zone"
+  zone = var.secondary_zone
+
+  instances = [ for instance in google_compute_instance_from_template.secondary_zone_app_server: instance.self_link ]
+}

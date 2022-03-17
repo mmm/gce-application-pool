@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "primary_zone_uig_id" {
-  value = google_compute_instance_group.primary_zone_uig.id
-}
-
-output "secondary_zone_uig_id" {
-  value = google_compute_instance_group.secondary_zone_uig.id
-}
+#terraform {
+#  backend "gcs" {
+#    # must specify "bucket" when running terraform.
+#    # E.g., `terraform init -backend-config="bucket=mybucket"`
+#    prefix  = "terraform/target-pool/application-pool/state"
+#  }
+#}
