@@ -15,7 +15,6 @@
 
 locals {
   num_app_servers = 6
-  application_port = "80"
 }
 
 #data "terraform_remote_state" "network" {
@@ -29,18 +28,18 @@ data "terraform_remote_state" "network" {
   backend = "local"
 
   config = {
-    path = "../network/terraform.tfstate"
+    path = "../../network/terraform.tfstate"
   }
 }
 
-#data "terraform_remote_state" "application_pool" {
+#data "terraform_remote_state" "application_mig" {
   #backend = "gcs"
   #config = {
     #bucket  = var.state_bucket
     #prefix  = "terraform/application-pool/state"
   #}
 #}
-data "terraform_remote_state" "application_uig" {
+data "terraform_remote_state" "application_mig" {
   backend = "local"
 
   config = {
@@ -48,42 +47,33 @@ data "terraform_remote_state" "application_uig" {
   }
 }
 
-resource "google_compute_region_health_check" "regional_tcp_80_health_check" {
-  name               = "regional-tcp-80-health-check"
+resource "google_compute_region_health_check" "default" {
+  name               = "heater-health-check"
   region             = var.region
 
-  tcp_health_check {
+  http_health_check {
     port = 80
-  }
-
-  log_config {
-    enable = true
   }
 }
 
-resource "google_compute_region_backend_service" "application_uig_backend_service" {
-  name = "regional-uig-backend-service"
+resource "google_compute_region_backend_service" "default" {
   region = var.region
+  name = "region-service"
+  health_checks = [google_compute_region_health_check.default.id]
   protocol = "TCP"
   #load_balancing_scheme = "INTERNAL_MANAGED"
   #locality_lb_policy = "ROUND_ROBIN"
   session_affinity = "NONE"
 
-  health_checks = [google_compute_region_health_check.regional_tcp_80_health_check.id]
-
   backend {
-    group = data.terraform_remote_state.application_uig.outputs.primary_zone_uig_id
-    #balancing_mode = "UTILIZATION"
-  }
-  backend {
-    group = data.terraform_remote_state.application_uig.outputs.secondary_zone_uig_id
+    group = data.terraform_remote_state.application_mig.outputs.instance_group
     #balancing_mode = "UTILIZATION"
   }
 }
 
-resource "google_compute_forwarding_rule" "google_compute_uig_forwarding_rule" {
-  name                  = "l4-ilb-uig-forwarding-rule"
-  backend_service       = google_compute_region_backend_service.application_uig_backend_service.id
+resource "google_compute_forwarding_rule" "google_compute_forwarding_rule" {
+  name                  = "l4-ilb-forwarding-rule"
+  backend_service       = google_compute_region_backend_service.default.id
   region                = var.region
   ip_address            = data.terraform_remote_state.network.outputs.ilb_head_address
   ip_protocol           = "TCP"
@@ -92,19 +82,4 @@ resource "google_compute_forwarding_rule" "google_compute_uig_forwarding_rule" {
   allow_global_access   = true
   #network               = google_compute_network.ilb_network.id
   #subnetwork            = google_compute_subnetwork.ilb_subnet.id
-}
-
-
-resource "google_compute_firewall" "allow_health_check" {
-  name        = "allow-health-check"
-  network     = var.network
-
-  allow {
-    protocol  = "tcp"
-    ports     = ["80", "5000"]
-  }
-
-  source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ]
-
-  target_tags = ["allow-health-check"]
 }

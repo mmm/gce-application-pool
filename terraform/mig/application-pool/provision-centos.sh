@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright 2022 Google LLC
 #
@@ -13,10 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "primary_zone_uig_id" {
-  value = google_compute_instance_group.primary_zone_uig.id
-}
+set -x
 
-output "secondary_zone_uig_id" {
-  value = google_compute_instance_group.secondary_zone_uig.id
-}
+yum -y install \
+  redhat-lsb \
+  fuse \
+  fuse-devel \
+  fuse-devel-static \
+  gvfs-fuse \
+  libfuse2
+
+modprobe fuse
+
+# some debug tooling
+yum -y install \
+  netcat \
+  bind-utils \
+  postgresql
+
+# docker
+yum -y install \
+  yum-utils \
+  device-mapper-persistent-data \
+  lvm2
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum -y install docker
+systemctl enable docker
+systemctl start docker
+

@@ -13,10 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "primary_zone_uig_id" {
-  value = google_compute_instance_group.primary_zone_uig.id
-}
-
-output "secondary_zone_uig_id" {
-  value = google_compute_instance_group.secondary_zone_uig.id
+output "instance_group" {
+  value = google_compute_region_instance_group_manager.regional_app_server_mig.instance_group
 }

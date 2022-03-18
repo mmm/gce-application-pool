@@ -17,8 +17,12 @@ variable "region" {
   default = "us-central1"
 }
 
-variable "zone" {
+variable "primary_zone" {
   default = "us-central1-f"
+}
+
+variable "secondary_zone" {
+  default = "us-central1-c"
 }
 
 variable "instance_type" {

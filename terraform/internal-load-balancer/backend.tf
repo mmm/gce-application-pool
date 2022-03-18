@@ -17,6 +17,6 @@
 #  backend "gcs" {
 #    # must specify "bucket" when running terraform.
 #    # E.g., `terraform init -backend-config="bucket=mybucket"`
-#    prefix  = "terraform/ilb/state"
+#    prefix  = "terraform/internal-load-balancer/state"
 #  }
 #}
