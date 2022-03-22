@@ -14,5 +14,5 @@
 # limitations under the License.
 
 output "instance_group" {
-  value = google_compute_region_instance_group_manager.regional_app_server_mig.instance_group
+  value = google_compute_region_instance_group_manager.regional_mig.instance_group
 }

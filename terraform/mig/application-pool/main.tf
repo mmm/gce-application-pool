@@ -21,7 +21,7 @@ locals {
 }
 
 resource "google_compute_instance_template" "mig_app_server_template" {
-  name_prefix  = "regional-app-server"
+  name_prefix  = "regional-mig-app-server"
   machine_type = var.instance_type
   region       = var.region
 
@@ -51,8 +51,8 @@ resource "google_compute_instance_template" "mig_app_server_template" {
   #}
 }
 
-resource "google_compute_region_instance_group_manager" "regional_app_server_mig" {
-  name               = "regional-app-server-mig"
+resource "google_compute_region_instance_group_manager" "regional_mig" {
+  name               = "application-regional-mig"
   base_instance_name = "regional-mig-app-server"
   region               = "us-central1"
   distribution_policy_zones = ["us-central1-c","us-central1-f"]
