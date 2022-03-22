@@ -68,7 +68,7 @@ resource "google_compute_instance_from_template" "primary_zone_app_server" {
 
 resource "google_compute_instance_from_template" "secondary_zone_app_server" {
   count = local.num_app_servers_per_zone
-  name = "seondary-zone-app-server-${count.index}"
+  name = "secondary-zone-app-server-${count.index}"
   zone = var.secondary_zone
 
   source_instance_template = google_compute_instance_template.uig_app_server_template.id
