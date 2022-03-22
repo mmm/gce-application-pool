@@ -104,7 +104,7 @@ resource "google_compute_firewall" "allow_health_check" {
     ports     = ["80", "5000"]
   }
 
-  source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ]
+  source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ] # GCP Healthcheck sources
 
   target_tags = ["allow-health-check"]
 }
