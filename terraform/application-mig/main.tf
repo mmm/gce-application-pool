@@ -49,6 +49,8 @@ resource "google_compute_instance_template" "mig_app_server_template" {
   #lifecycle {
     #create_before_destroy = true
   #}
+  
+  tags = ["allow-health-check"]
 }
 
 resource "google_compute_region_instance_group_manager" "regional_mig" {

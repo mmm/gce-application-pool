@@ -13,23 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable "region" {
-  default = "us-central1"
-}
-
-variable "zone" {
-  default = "us-central1-f"
-}
-
-variable "instance_type" {
-  default = "n1-standard-2"
-}
-
-variable "tags" {
-  default = []
-}
-
-variable "network" {
-  default = "default"
-}
-
+#terraform {
+#  backend "gcs" {
+#    # must specify "bucket" when running terraform.
+#    # E.g., `terraform init -backend-config="bucket=mybucket"`
+#    prefix  = "terraform/application-uig/state"
+#  }
+#}

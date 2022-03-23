@@ -18,13 +18,6 @@ locals {
   application_port = "80"
 }
 
-#data "terraform_remote_state" "network" {
-  #backend = "gcs"
-  #config = {
-    #bucket  = var.state_bucket
-    #prefix  = "terraform/network/state"
-  #}
-#}
 data "terraform_remote_state" "network" {
   backend = "local"
 
@@ -33,36 +26,24 @@ data "terraform_remote_state" "network" {
   }
 }
 
-#data "terraform_remote_state" "application_pool" {
-  #backend = "gcs"
-  #config = {
-    #bucket  = var.state_bucket
-    #prefix  = "terraform/application-pool/state"
-  #}
-#}
 data "terraform_remote_state" "application_uig" {
   backend = "local"
 
   config = {
-    path = "../application-pool/terraform.tfstate"
+    path = "../application-uig/terraform.tfstate"
   }
 }
 
-resource "google_compute_region_health_check" "regional_tcp_80_health_check" {
-  name               = "regional-tcp-80-health-check"
-  region             = var.region
+#data "terraform_remote_state" "application_mig" {
+  #backend = "local"
 
-  tcp_health_check {
-    port = 80
-  }
+  #config = {
+    #path = "../application-mig/terraform.tfstate"
+  #}
+#}
 
-  log_config {
-    enable = true
-  }
-}
-
-resource "google_compute_region_backend_service" "application_uig_backend_service" {
-  name = "regional-uig-backend-service"
+resource "google_compute_region_backend_service" "application_backend_service" {
+  name = "regional-backend-service"
   region = var.region
   protocol = "TCP"
   #load_balancing_scheme = "INTERNAL_MANAGED"
@@ -79,11 +60,28 @@ resource "google_compute_region_backend_service" "application_uig_backend_servic
     group = data.terraform_remote_state.application_uig.outputs.secondary_zone_uig_id
     #balancing_mode = "UTILIZATION"
   }
+  #backend {
+    #group = data.terraform_remote_state.application_mig.outputs.instance_group
+    ##balancing_mode = "UTILIZATION"
+  #}
 }
 
-resource "google_compute_forwarding_rule" "google_compute_uig_forwarding_rule" {
-  name                  = "l4-ilb-uig-forwarding-rule"
-  backend_service       = google_compute_region_backend_service.application_uig_backend_service.id
+resource "google_compute_region_health_check" "regional_tcp_80_health_check" {
+  name               = "regional-tcp-80-health-check"
+  region             = var.region
+
+  tcp_health_check {
+    port = 80
+  }
+
+  log_config {
+    enable = true
+  }
+}
+
+resource "google_compute_forwarding_rule" "application_forwarding_rule" {
+  name                  = "l4-ilb-application-forwarding-rule"
+  backend_service       = google_compute_region_backend_service.application_backend_service.id
   region                = var.region
   ip_address            = data.terraform_remote_state.network.outputs.ilb_head_address
   ip_protocol           = "TCP"
@@ -93,7 +91,6 @@ resource "google_compute_forwarding_rule" "google_compute_uig_forwarding_rule" {
   #network               = google_compute_network.ilb_network.id
   #subnetwork            = google_compute_subnetwork.ilb_subnet.id
 }
-
 
 resource "google_compute_firewall" "allow_health_check" {
   name        = "allow-health-check"
