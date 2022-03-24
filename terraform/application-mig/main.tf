@@ -14,7 +14,7 @@
 # limitations under the License.
 
 locals {
-  num_app_servers = 6
+  num_app_servers = 12
   image = "ubuntu-os-cloud/ubuntu-2004-lts"
   #image = "centos-cloud/centos-7"
   #image = "centos-cloud/centos-8"
