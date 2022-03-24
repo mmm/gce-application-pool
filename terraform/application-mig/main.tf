@@ -53,6 +53,33 @@ resource "google_compute_instance_template" "mig_app_server_template" {
   tags = ["allow-health-check"]
 }
 
+resource "google_compute_health_check" "autohealing" {
+  name                = "autohealing-health-check"
+  check_interval_sec  = 5
+  timeout_sec         = 5
+  healthy_threshold   = 2
+  unhealthy_threshold = 10 # 50 seconds
+
+  http_health_check {
+    request_path = "/healthz"
+    port         = "8080"
+  }
+}
+
+resource "google_compute_region_health_check" "autohealing" {
+  name        = "autohealing-health-check"
+  description = "Health check via tcp"
+
+  timeout_sec         = 30
+  check_interval_sec  = 5
+  healthy_threshold   = 2
+  unhealthy_threshold = 10 # 50 seconds
+
+  tcp_health_check {
+    port               = "80"
+  }
+}
+
 resource "google_compute_region_instance_group_manager" "regional_mig" {
   name               = "application-regional-mig"
   base_instance_name = "regional-mig-app-server"
@@ -62,23 +89,8 @@ resource "google_compute_region_instance_group_manager" "regional_mig" {
   version {
     instance_template  = google_compute_instance_template.mig_app_server_template.id
   }
+  auto_healing_policies {
+    health_check      = google_compute_region_health_check.autohealing.id
+    initial_delay_sec = 300
+  }
 }
-
-#resource "google_compute_region_health_check" "tcp-region-health-check" {
-  #name        = "tcp-region-health-check"
-  #description = "Health check via tcp"
-
-  #timeout_sec         = 1
-  #check_interval_sec  = 1
-  #healthy_threshold   = 4
-  #unhealthy_threshold = 5
-
-  #tcp_health_check {
-    #port               = "5000"
-    ##port_name          = "health-check-port"
-    ##port_specification = "USE_NAMED_PORT"
-    #request            = "ARE YOU HEALTHY?"
-    #proxy_header       = "NONE"
-    #response           = "I AM HEALTHY"
-  #}
-#}
