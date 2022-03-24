@@ -14,7 +14,7 @@
 # limitations under the License.
 
 locals {
-  num_app_servers = 6
+  num_app_servers = 12
   image = "ubuntu-os-cloud/ubuntu-2004-lts"
   #image = "centos-cloud/centos-7"
   #image = "centos-cloud/centos-8"
@@ -53,32 +53,47 @@ resource "google_compute_instance_template" "mig_app_server_template" {
   tags = ["allow-health-check"]
 }
 
+resource "google_compute_health_check" "autohealing" {
+  name        = "autohealing-health-check"
+  description = "Health check via tcp"
+
+  timeout_sec         = 30
+  check_interval_sec  = 300
+  healthy_threshold   = 1
+  unhealthy_threshold = 10
+
+  tcp_health_check {
+    port               = "80"
+  }
+}
+
 resource "google_compute_region_instance_group_manager" "regional_mig" {
   name               = "application-regional-mig"
   base_instance_name = "regional-mig-app-server"
   region               = "us-central1"
   distribution_policy_zones = ["us-central1-c","us-central1-f"]
-  target_size        = local.num_app_servers
+  #target_size        = local.num_app_servers
   version {
     instance_template  = google_compute_instance_template.mig_app_server_template.id
   }
+  auto_healing_policies {
+    health_check      = google_compute_health_check.autohealing.id
+    initial_delay_sec = 300
+  }
 }
 
-#resource "google_compute_region_health_check" "tcp-region-health-check" {
-  #name        = "tcp-region-health-check"
-  #description = "Health check via tcp"
+resource "google_compute_region_autoscaler" "application_autoscaler" {
+  name   = "application-autoscaler"
+  region = var.region
+  target = google_compute_region_instance_group_manager.regional_mig.id
 
-  #timeout_sec         = 1
-  #check_interval_sec  = 1
-  #healthy_threshold   = 4
-  #unhealthy_threshold = 5
+  autoscaling_policy {
+    max_replicas    = local.num_app_servers
+    min_replicas    = 2
+    cooldown_period = 60
 
-  #tcp_health_check {
-    #port               = "5000"
-    ##port_name          = "health-check-port"
-    ##port_specification = "USE_NAMED_PORT"
-    #request            = "ARE YOU HEALTHY?"
-    #proxy_header       = "NONE"
-    #response           = "I AM HEALTHY"
-  #}
-#}
+    cpu_utilization {
+      target = 0.5
+    }
+  }
+}
