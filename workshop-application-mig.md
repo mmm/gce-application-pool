@@ -1,13 +1,13 @@
-# Workshop - Application Pool
+# Workshop - Managed Instance Group Application Pool
 
 What if you have a legacy application that you want to run in Google Cloud,
 and you still want to take advantage of as much of the automation and intelligent
 application management as possible?
 
-What if your application _also_ has some pretty heinous constraints such as:
+What if your application _also_ can't be containerized for legal/policy reasons?
 
-- It can't be containerized for legal/policy reasons
-- It requires about a day turnaround time to provision license entitlements for each instance created
+We'll assume for this workshop that the application can use an API to provision
+license entitlements for each instance created.
 
 This is the problem we'll work to solve in this workshop.
 
@@ -127,7 +127,7 @@ database creation to complete.
 
 Next, spin up application servers
 
-    cd ../application-pool
+    cd ../application-mig
     terraform init
     terraform plan
     terraform apply
@@ -140,6 +140,14 @@ and wait for the resources to be created.
 Create an [Internal Load Balancer](https://cloud.google.com/load-balancing/docs/internal)
 
     cd ../internal-load-balancer
+
+Edit the `main.tf` template to uncomment the mig-related components:
+
+- the `application_mig` terraform remote state data source
+- the `application_mig` backend in the application backend service
+
+Then run
+
     terraform init
     terraform plan
     terraform apply
@@ -170,6 +178,19 @@ for the head of the internal load balancer during the network setup as their
 These clients just use old-school apache-bench to siege the head of the
 internal load balancer as soon as they start up.
     
+
+## Load balancer details
+
+In Google Cloud, Load balancers are actually implemented using a combination of
+of separate components.  Here, for an Internal Load Balancer, we have:
+
+- [Forwarding Rule](https://cloud.google.com/load-balancing/docs/internal#forwarding_rule)
+- [Backend Service](https://cloud.google.com/load-balancing/docs/internal#backend-service)
+- [Health Checks](https://cloud.google.com/load-balancing/docs/internal#health-checking)
+- [Firewall Rules](https://cloud.google.com/load-balancing/docs/internal#firewall_rules)
+
+![Load balancer details](media/application-mig-with-ilb.png)
+
 
 ## Cleaning up
 

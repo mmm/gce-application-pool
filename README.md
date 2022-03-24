@@ -23,5 +23,7 @@ should not be used for any production applications.
 
 ## Test scenarios / workshops
 
-- [Basic Application Pool Workshop](workshop-application-pool.md)
+- [Constrained Application - Unmanaged Instance Group Workshop](workshop-application-uig.md)
+- [Basic Application - Managed Instance Group Workshop](workshop-application-mig.md) where we relax the second constraint above
+  and assume we can entitle each new instance in a reasonably short timeframe
 

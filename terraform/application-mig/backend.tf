@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "target_pool_id" {
-  value = google_compute_target_pool.application-target-pool.id
-}
+#terraform {
+#  backend "gcs" {
+#    # must specify "bucket" when running terraform.
+#    # E.g., `terraform init -backend-config="bucket=mybucket"`
+#    prefix  = "terraform/application-mig/state"
+#  }
+#}
